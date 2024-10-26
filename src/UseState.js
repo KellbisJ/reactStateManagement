@@ -1,20 +1,20 @@
 import React from 'react';
 
 const UseState = ({ name }) => {
-	const [error, setError] = React.useState(false);
+	const [error, setError] = React.useState(true);
 	const [loading, setLoading] = React.useState(false);
 
 	React.useEffect(() => {
-		console.log('effect starting');
-		console.log('effect end');
+		// console.log('effect starting');
+		// console.log('effect end');
 
 		if (!!loading) {
 			setTimeout(() => {
-				console.log('validation');
+				// console.log('validation');
 
 				setLoading(false);
 
-				console.log('end validation');
+				// console.log('end validation');
 			}, 2000);
 		}
 	}, [loading]);
