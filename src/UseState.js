@@ -3,59 +3,50 @@ import React from 'react';
 const SECURITY_CODE = 'Perro';
 
 const UseState = ({ name }) => {
-	const [value, setValue] = React.useState('');
-	const [voidError, setVoidError] = React.useState(false);
-	const [error, setError] = React.useState(false);
-	const [loading, setLoading] = React.useState(false);
+	const [state, setState] = React.useState({
+		value: '',
+		voidError: false,
+		error: false,
+		loading: false,
+	});
+	// With compose states with useState hook, remember to use the spread operator to keep the previous state.
 
-	console.log(value);
+	console.log(state);
 
 	React.useEffect(() => {
-		// console.log('effect starting');
-		// console.log('effect end');
-
-		if (!!loading) {
+		if (!!state.loading) {
 			setTimeout(() => {
-				// console.log('validation');
-
-				if (value === '') {
-					setLoading(false);
-					setVoidError(true);
+				if (state.value === '') {
+					setState({ ...state, loading: false, voidError: true, error: false });
 					return;
 				}
-				if (value !== SECURITY_CODE) {
-					setLoading(false);
-					setError(true);
+				if (state.value !== SECURITY_CODE) {
+					setState({ ...state, loading: false, voidError: false, error: true });
 					return;
 				}
-				setLoading(false);
-
-				// console.log('end validation');
+				setState({ ...state, loading: false, voidError: false, error: false });
 			}, 2000);
 		}
-	}, [loading]);
+	}, [state.loading]);
 	return (
 		<div>
 			<h2>Delete {name}</h2>
 			<p>Please, type the secure code to delete this component.</p>
 
-			{voidError && <p className="error">Error: Cannot be empty</p>}
-			{error && <p className="error">Error: Wrong code</p>}
-			{loading && <p className="loading">Loading...</p>}
+			{state.voidError && <p className="error">Error: Cannot be empty</p>}
+			{state.error && <p className="error">Error: Wrong code</p>}
+			{state.loading && <p className="loading">Loading...</p>}
 
 			<input
 				placeholder="Security code"
-				value={value}
+				value={state.value}
 				onChange={(e) => {
-					setValue(e.target.value);
+					setState({ ...state, value: e.target.value });
 				}}
 			/>
 			<button
 				onClick={() => {
-					setLoading(true);
-					// Set all the errors in false mode for avoid that errors appears in a new validation
-					setError(false);
-					setVoidError(false);
+					setState({ ...state, loading: true, voidError: false, error: false }); // Set all the errors in false mode for avoid that errors appears in a new validation
 				}}>
 				Check
 			</button>
