@@ -1,11 +1,15 @@
 import React from 'react';
 import { Loading } from './Loading';
 
+const SECURITY_CODE = 'Perro';
+
 class ClassState extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			error: true,
+			value: '',
+			voidError: false,
+			error: false,
 			loading: false,
 		};
 	}
@@ -14,12 +18,20 @@ class ClassState extends React.Component {
 
 	// }
 	componentDidUpdate() {
-		// console.log('componentDidUpdate');
+		console.log('componentDidUpdate');
 
 		if (!!this.state.loading) {
 			setTimeout(() => {
 				// console.log('validation');
 
+				if (this.state.value === '') {
+					this.setState({ loading: false, voidError: true, error: false });
+					return;
+				}
+				if (this.state.value !== SECURITY_CODE) {
+					this.setState({ loading: false, voidError: false, error: true });
+					return;
+				}
 				this.setState({ loading: false });
 
 				// console.log('end validation');
@@ -29,8 +41,10 @@ class ClassState extends React.Component {
 
 	render() {
 		const name = this.props.name;
+		const voidError = this.state.voidError;
 		const error = this.state.error;
 		const loading = this.state.loading;
+		const inputValue = this.state.value;
 
 		return (
 			<div>
@@ -39,10 +53,18 @@ class ClassState extends React.Component {
 
 				{error && <p className="error">Error: Wrong code</p>}
 
+				{voidError && <p className="error">Error: Cannot be empty</p>}
+
 				{loading && <Loading />}
 
-				<input placeholder="Security code" />
-				<button onClick={() => this.setState({ loading: true })}>Check</button>
+				<input
+					placeholder="Security code"
+					value={inputValue}
+					onChange={(event) => {
+						this.setState({ value: event.target.value });
+					}}
+				/>
+				<button onClick={() => this.setState({ loading: true, error: false, voidError: false })}>Check</button>
 			</div>
 		);
 	}
