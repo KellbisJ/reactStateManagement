@@ -12,6 +12,29 @@ const UseState = ({ name }) => {
 		deleted: false,
 	});
 	// With compose states with useState hook, remember to use the spread operator to keep the previous state.
+	const isVoidError = () => {
+		setState({ ...state, loading: false, voidError: true, error: false });
+	};
+	const isError = () => {
+		setState({ ...state, loading: false, voidError: false, error: true });
+	};
+	const isConfirmed = () => {
+		setState({ ...state, loading: false, voidError: false, error: false, confirmed: true });
+	};
+
+	const securityCodeField = (newValue) => {
+		setState({ ...state, value: newValue });
+	};
+
+	const checkSecurityCode = () => {
+		setState({ ...state, loading: true, voidError: false, error: false });
+	};
+	const isDeleted = () => {
+		setState({ ...state, deleted: true });
+	};
+	const reset = () => {
+		setState({ ...state, confirmed: false, deleted: false, value: '' });
+	};
 
 	console.log(state);
 
@@ -19,14 +42,14 @@ const UseState = ({ name }) => {
 		if (!!state.loading) {
 			setTimeout(() => {
 				if (state.value === '') {
-					setState({ ...state, loading: false, voidError: true, error: false });
+					isVoidError();
 					return;
 				}
 				if (state.value !== SECURITY_CODE) {
-					setState({ ...state, loading: false, voidError: false, error: true });
+					isError();
 					return;
 				}
-				setState({ ...state, loading: false, voidError: false, error: false, confirmed: true });
+				isConfirmed();
 			}, 2000);
 		}
 	}, [state.loading]);
@@ -44,12 +67,12 @@ const UseState = ({ name }) => {
 					placeholder="Security code"
 					value={state.value}
 					onChange={(e) => {
-						setState({ ...state, value: e.target.value });
+						securityCodeField(e.target.value);
 					}}
 				/>
 				<button
 					onClick={() => {
-						setState({ ...state, loading: true, voidError: false, error: false }); // Set all the errors in false mode for avoid that errors appears in a new validation
+						checkSecurityCode(); // Set all the errors in false mode for avoid that errors appears in a new validation
 					}}>
 					Check
 				</button>
@@ -61,13 +84,13 @@ const UseState = ({ name }) => {
 				<p>Are you sure you want to delete this component?</p>
 				<button
 					onClick={() => {
-						setState({ ...state, deleted: true });
+						isDeleted();
 					}}>
 					Yes, delete
 				</button>
 				<button
 					onClick={() => {
-						setState({ ...state, confirmed: false });
+						reset();
 					}}>
 					No, go back
 				</button>
@@ -79,7 +102,7 @@ const UseState = ({ name }) => {
 				<p>The component has been deleted</p>
 				<button
 					onClick={() => {
-						setState({ ...state, confirmed: false, deleted: false, value: '' });
+						reset();
 					}}>
 					Reset and go back
 				</button>
