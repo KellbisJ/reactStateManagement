@@ -1,3 +1,4 @@
+import { type } from '@testing-library/user-event/dist/type';
 import React from 'react';
 
 const SECURITY_CODE = 'Perro';
@@ -13,18 +14,18 @@ const UseReducer = ({ name }) => {
 			setTimeout(() => {
 				if (state.value === '') {
 					dispatch({
-						type: 'VOID_ERROR',
+						type: actionTypes.VOID_ERROR,
 					});
 					return;
 				}
 				if (state.value !== SECURITY_CODE) {
 					dispatch({
-						type: 'ERROR',
+						type: actionTypes.ERROR,
 					});
 					return;
 				}
 				dispatch({
-					type: 'CONFIRMED',
+					type: actionTypes.CONFIRMED,
 				});
 			}, 2000);
 		}
@@ -44,14 +45,14 @@ const UseReducer = ({ name }) => {
 					value={state.value}
 					onChange={(e) => {
 						dispatch({
-							type: 'SECURITY_CODE_FIELD',
+							type: actionTypes.SECURITY_CODE_FIELD,
 							payload: e.target.value,
 						});
 					}}
 				/>
 				<button
 					onClick={() => {
-						dispatch({ type: 'CHECK_SECURITY_CODE' });
+						dispatch({ type: [actionTypes.CHECK_SECURITY_CODE] });
 					}}>
 					Check
 				</button>
@@ -63,13 +64,13 @@ const UseReducer = ({ name }) => {
 				<p>Are you sure you want to delete this component?</p>
 				<button
 					onClick={() => {
-						dispatch({ type: 'DELETE' });
+						dispatch({ type: actionTypes.DELETE });
 					}}>
 					Yes, delete
 				</button>
 				<button
 					onClick={() => {
-						dispatch({ type: 'RESET' });
+						dispatch({ type: actionTypes.RESET });
 					}}>
 					No, go back
 				</button>
@@ -81,7 +82,7 @@ const UseReducer = ({ name }) => {
 				<p>The component has been deleted</p>
 				<button
 					onClick={() => {
-						dispatch({ type: 'RESET' });
+						dispatch({ type: actionTypes.RESET });
 					}}>
 					Reset and go back
 				</button>
@@ -99,41 +100,50 @@ const initialState = {
 	deleted: false,
 };
 
+const actionTypes = {
+	VOID_ERROR: 'VOID_ERROR',
+	ERROR: 'ERROR',
+	CONFIRMED: 'CONFIRMED',
+	SECURITY_CODE_FIELD: 'SECURITY_CODE_FIELD',
+	CHECK_SECURITY_CODE: 'CHECK_SECURITY_CODE',
+	DELETE: 'DELETE',
+	RESET: 'RESET',
+};
 const reducerObject = (state, payload) => ({
-	VOID_ERROR: {
+	[actionTypes.VOID_ERROR]: {
 		...state,
 		loading: false,
 		voidError: true,
 		error: false,
 	},
-	ERROR: {
+	[actionTypes.ERROR]: {
 		...state,
 		loading: false,
 		voidError: false,
 		error: true,
 	},
-	CONFIRMED: {
+	[actionTypes.CONFIRMED]: {
 		...state,
 		loading: false,
 		voidError: false,
 		error: false,
 		confirmed: true,
 	},
-	SECURITY_CODE_FIELD: {
+	[actionTypes.SECURITY_CODE_FIELD]: {
 		...state,
 		value: payload,
 	},
-	CHECK_SECURITY_CODE: {
+	[actionTypes.CHECK_SECURITY_CODE]: {
 		...state,
 		loading: true,
 		voidError: false,
 		error: false,
 	},
-	DELETE: {
+	[actionTypes.DELETE]: {
 		...state,
 		deleted: true,
 	},
-	RESET: {
+	[actionTypes.RESET]: {
 		...state,
 		confirmed: false,
 		deleted: false,
@@ -144,12 +154,5 @@ const reducerObject = (state, payload) => ({
 const reducer = (state, action) => {
 	return reducerObject(state, action.payload)[action.type] ? reducerObject(state, action.payload)[action.type] : { ...state };
 };
-// const reducer = (state, action) => {
-// 	if (reducerObject(state, action.payload)[action.type]) {
-// 		return reducerObject(state, action.payload)[action.type];
-// 	} else {
-// 		return { ...state };
-// 	}
-// };
 
 export { UseReducer };
