@@ -1,32 +1,38 @@
-import { type } from '@testing-library/user-event/dist/type';
 import React from 'react';
 
 const SECURITY_CODE = 'Perro';
 
 const UseReducer = ({ name }) => {
 	const [state, dispatch] = React.useReducer(reducer, initialState);
-	// With compose states with useState hook, remember to use the spread operator to keep the previous state.
 
-	console.log(state);
+	const isVoidError = () => dispatch({ type: actionTypes.VOID_ERROR });
+	const isError = () => dispatch({ type: actionTypes.ERROR });
+	const isConfirmed = () => dispatch({ type: actionTypes.CONFIRMED });
+	const checkSecurityCode = () => dispatch({ type: actionTypes.CHECK_SECURITY_CODE });
+	const isDeleted = () => dispatch({ type: actionTypes.DELETE });
+	const reset = () => dispatch({ type: actionTypes.RESET });
+
+	const securityCodeField = ({ target: { value } }) => {
+		dispatch({
+			type: actionTypes.SECURITY_CODE_FIELD,
+			payload: value,
+		});
+	};
+
+	// console.log(state);
 
 	React.useEffect(() => {
 		if (!!state.loading) {
 			setTimeout(() => {
 				if (state.value === '') {
-					dispatch({
-						type: actionTypes.VOID_ERROR,
-					});
+					isVoidError();
 					return;
 				}
 				if (state.value !== SECURITY_CODE) {
-					dispatch({
-						type: actionTypes.ERROR,
-					});
+					isError();
 					return;
 				}
-				dispatch({
-					type: actionTypes.CONFIRMED,
-				});
+				isConfirmed();
 			}, 2000);
 		}
 	}, [state.loading]);
@@ -43,49 +49,27 @@ const UseReducer = ({ name }) => {
 				<input
 					placeholder="Security code"
 					value={state.value}
-					onChange={(e) => {
-						dispatch({
-							type: actionTypes.SECURITY_CODE_FIELD,
-							payload: e.target.value,
-						});
-					}}
+					// onChange={(e) => {
+					// 	securityCodeField(e);
+					// }}
+					onChange={securityCodeField}
 				/>
-				<button
-					onClick={() => {
-						dispatch({ type: [actionTypes.CHECK_SECURITY_CODE] });
-					}}>
-					Check
-				</button>
+				<button onClick={checkSecurityCode}>Check</button>
 			</div>
 		);
 	} else if (!!state.confirmed && !state.deleted) {
 		return (
 			<React.Fragment>
 				<p>Are you sure you want to delete this component?</p>
-				<button
-					onClick={() => {
-						dispatch({ type: actionTypes.DELETE });
-					}}>
-					Yes, delete
-				</button>
-				<button
-					onClick={() => {
-						dispatch({ type: actionTypes.RESET });
-					}}>
-					No, go back
-				</button>
+				<button onClick={isDeleted}>Yes, delete</button>
+				<button onClick={reset}>No, go back</button>
 			</React.Fragment>
 		);
 	} else {
 		return (
 			<React.Fragment>
 				<p>The component has been deleted</p>
-				<button
-					onClick={() => {
-						dispatch({ type: actionTypes.RESET });
-					}}>
-					Reset and go back
-				</button>
+				<button onClick={reset}>Reset and go back</button>
 			</React.Fragment>
 		);
 	}
